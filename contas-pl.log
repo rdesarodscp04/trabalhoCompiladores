@@ -1,0 +1,26 @@
+11:15:17 exemplo khalma-2$ make PROG=contas-pl
+bison -d contas-pl.y
+cc -DPROG="contas-pl"   -c -o contas-pl.tab.o contas-pl.tab.c
+flex contas-pl.l
+cc -DPROG="contas-pl"   -c -o lex.yy.o lex.yy.c
+gcc -o contas-pl contas-pl.tab.o lex.yy.o -ll
+chmod +x contas-pl
+11:15:35 exemplo khalma-2$ ./contas-pl
+2+3*4
+S - [2 | S].
+S - [3 | S].
+S - [4 | S].
+[B, A | S] - [A*B | S].
+[B, A | S] - [A+B | S].
+[X | S] - [print(X) | S].
+11:27:23 exemplo khalma-2$ gplc -o contas-pl-pl contas-pl.pl
+11:27:39 exemplo khalma-2$ echo '2+3*4' | ./contas-pl
+S - [2 | S].
+S - [3 | S].
+S - [4 | S].
+[B, A | S] - [A*B | S].
+[B, A | S] - [A+B | S].
+[X | S] - [print(X) | S].
+11:28:10 exemplo khalma-2$ echo '2+3*4' | ./contas-pl | ./contas-pl-pl
+print(2+3*4)
+11:28:47 exemplo khalma-2$
