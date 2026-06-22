@@ -1,4 +1,4 @@
-PROG=calc
+PROG=calcPP
 
 CFLAGS=-DPROG="$(PROG)"
 
@@ -16,5 +16,5 @@ lex.yy.c: $(PROG).l
 	flex $<
 
 $(PROG): $(PROG).tab.o lex.yy.o
-	gcc -o $@ $(PROG).tab.o lex.yy.o -ll
+	gcc -o $@ $(PROG).tab.o lex.yy.o -lfl
 	chmod +x $@
