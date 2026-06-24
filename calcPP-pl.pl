@@ -1,6 +1,10 @@
 
 :- initialization((write('program: '),nl,load_apt(T),nl, halt)).
 
+:- dynamic prints/1.
+prints(0).
+
+
 load_apt(T) :-
     read(X),
     load_apt(X, [], T).
@@ -27,7 +31,7 @@ load_apt('Op' - Direita, Acumulador, OUT) :-
 
 load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     Direita = [print | _], !,
-    write('printf("%d\\n", pop());'), nl,
+    write('CALL print_int'), nl,
     read(X),
     load_apt(X, [print | Acumulador], OUT).
 
@@ -36,10 +40,29 @@ load_apt(fim, Acumulador, OUT) :-
     % write('Acabou-se'),nl,
     load_apt(X, Acumulador, OUT).
 
-load_apt(A, Acumulador, OUT) :-
+%Variaveis
+load_apt(TermoCompleto, Acumulador, OUT) :-
+    term_to_atom(TermoCompleto, Atom),
+   
+    sub_atom(Atom, _, _, _, 'var-'), !,
+    
+    split_string(Atom, "_", "", Termos),
+    Termos = [Esquerda, Direita],
+    split_string(Esquerda, "-", "", Var),
+    split_string(Direita, "-", "", Val),
+    
+    Var = [_, NomeVar],
+    Val = [_, ValorVar],
+    
+    write('PUSH '), write(ValorVar), nl,
+    write('STORE '), write(NomeVar), nl,
     read(X),
-    % write('isto foi ignorado: '), write(A), nl,
     load_apt(X, Acumulador, OUT).
+
+
+
+
+
 
 converte_op('+', 'ADD').
 converte_op('-', 'SUB').
