@@ -1,0 +1,13 @@
+program: 
+PUSH 123
+PUSH 0
+STORE 
+PUSH 0
+LOAD
+PUSH print_int
+CALL
+PUSH 1
+
+
+
+
