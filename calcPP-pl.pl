@@ -59,11 +59,6 @@ load_apt(TermoCompleto, Acumulador, OUT) :-
     read(X),
     load_apt(X, Acumulador, OUT).
 
-
-
-
-
-
 converte_op('+', 'ADD').
 converte_op('-', 'SUB').
 converte_op('*', 'MUL').
