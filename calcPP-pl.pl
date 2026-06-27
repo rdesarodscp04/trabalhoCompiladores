@@ -35,9 +35,20 @@ load_apt('op' - Direita, Acumulador, OUT) :-
 
 load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     Direita = [print | _], !,
-    write('CALL print_int'), nl,
+    write('PUSH print_int'), nl,
+    write('CALL'), nl,
     read(X),
     load_apt(X, [print | Acumulador], OUT).
+
+load_apt('var' - Direita, Acumulador, OUT) :-
+    Direita = [NomeVar | _],
+    dicionario(Dict),
+    lookup(Dict, NomeVar, Val), !,
+    write('PUSH '),write(Val), nl,
+    write('STORE '), nl,
+    read(X),
+    load_apt(X, Acumulador, OUT).
+   
 
 %Guardar valor
 load_apt('var' - Direita, Acumulador, OUT) :-
