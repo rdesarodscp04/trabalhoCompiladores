@@ -1,8 +1,13 @@
 
-:- initialization((write('program: '),nl,load_apt(T),nl, halt)).
+:- initialization((write('program: '),nl, load_apt(_T),nl, halt)).
 
 :- dynamic prints/1.
+:- dynamic nVariaveis/1.
+:- dynamic dicionario/1.
+
 prints(0).
+nVariaveis(0).
+dicionario(_).
 
 
 load_apt(T) :-
@@ -20,8 +25,7 @@ load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     read(X),
     load_apt(X, [push(Instrucao) | Acumulador], OUT).
 
-
-load_apt('Op' - Direita, Acumulador, OUT) :- 
+load_apt('op' - Direita, Acumulador, OUT) :- 
     Direita = [Instrucao | _],
     member(Instrucao, [+, -, *, /]), !,
     converte_op(Instrucao, NomeInt),
@@ -35,27 +39,28 @@ load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     read(X),
     load_apt(X, [print | Acumulador], OUT).
 
-load_apt(fim, Acumulador, OUT) :-
+%Guardar valor
+load_apt('var' - Direita, Acumulador, OUT) :-
+    Direita = [NomeVar | _],
+    nVariaveis(N),
+    N1 is N + 1,
+    retract(nVariaveis(N)),
+    assert(nVariaveis(N1)),
+    retract(dicionario(DictAntigo)),         
+    insert(DictAntigo, NomeVar, N),         
+    assert(dicionario(DictAntigo)),
+    write('PUSH '),write(N), nl,
+    write('STORE '), nl,
     read(X),
-    % write('Acabou-se'),nl,
     load_apt(X, Acumulador, OUT).
 
-%Variaveis
-load_apt(TermoCompleto, Acumulador, OUT) :-
-    term_to_atom(TermoCompleto, Atom),
-   
-    sub_atom(Atom, _, _, _, 'var-'), !,
-    
-    split_string(Atom, "_", "", Termos),
-    Termos = [Esquerda, Direita],
-    split_string(Esquerda, "-", "", Var),
-    split_string(Direita, "-", "", Val),
-    
-    Var = [_, NomeVar],
-    Val = [_, ValorVar],
-    
-    write('PUSH '), write(ValorVar), nl,
-    write('STORE '), write(NomeVar), nl,
+%Carregar valor
+load_apt('val' - Direita, Acumulador, OUT) :-
+    Direita = [NomeVar | _],
+    dicionario(Dict),         
+    lookup(Dict, NomeVar, N),         
+    write('PUSH '),write(N), nl,
+    write('LOAD '),nl,
     read(X),
     load_apt(X, Acumulador, OUT).
 
@@ -63,6 +68,14 @@ converte_op('+', 'ADD').
 converte_op('-', 'SUB').
 converte_op('*', 'MUL').
 converte_op('/', 'DIV').
+
+insert(DICT, K, V) :- var(DICT ), !, DICT=[K=V|_].
+insert([K=_|_], K, _) :- !, fail.
+insert([_|DICT], K, V) :- insert(DICT, K, V).
+
+lookup(DICT, _, _) :- var(DICT ), !, fail.
+lookup([K=V|_], K, V).
+lookup([_|DICT], K, V) :- lookup(DICT, K, V).
 
 
 

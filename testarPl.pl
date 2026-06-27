@@ -12,4 +12,14 @@ load_apt(TermoCompleto, Acumulador, OUT) :-
     write('PUSH '), write(ValorVar), nl,
     write('STORE '), write(NomeVar), nl.
 
+
+
+insert(DICT, K, V) :- var(DICT ), !, DICT=[K=V|_].
+insert([K=_|_], K, _) :- !, fail.
+insert([_|DICT], K, V) :- insert(DICT, K, V).
+
+lookup(DICT, _, _) :- var(DICT ), !, fail.
+lookup([K=V|_], K, V).
+lookup([_|DICT], K, V) :- lookup(DICT, K, V).
+
     
