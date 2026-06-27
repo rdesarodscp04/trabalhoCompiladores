@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -110,14 +109,5 @@ L_exit_program:			// Return here, and...
   
 
 // -- Instructions ------------------------------------------------------------
-program: 
-	M[--SP] = 123;	// PUSH 123
-	M[--SP] = 0;	// PUSH 0
-	M[M[SP]] = M[SP+1]; SP += 2;	// STORE 
-	M[--SP] = 0;	// PUSH 0
-	M[SP] = M[M[SP]];		// LOAD
-	M[--SP] = (long) &&print_int;	// PUSH print_int
-	{ void *C = (void *) M[SP]; M[SP]=(long)&&P_8; goto *C; } // CALL
-P_8:	M[--SP] = 1;	// PUSH 1 
 }
 

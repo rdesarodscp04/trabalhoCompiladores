@@ -30,16 +30,16 @@ int yylex();
 linhas : linha
        | linhas linha ;
 
-linha : expr EOL               { printf("S - [print | S].\n"); fflush(stdout); }
-      | ID '=' expr            { printf("Var - [%s | S].\n", $1); fflush(stdout); }
+linha : expr EOL               { printf("s - [print | S].\n"); fflush(stdout); }
+      | ID '=' expr            { printf("var - [%s | S].\n", $1); fflush(stdout); }
       | EOL
 
-expr : NUM                     { printf("S - [%s | S].\n", $1); }
-     | ID                      { printf("Var - [%s | S].\n", $1); }
-     | expr '+' expr           { printf("Op - [+ | S].\n"); }
-     | expr '-' expr           { printf("Op - [- | S].\n"); }
-     | expr '*' expr           { printf("Op - [* | S].\n"); }
-     | expr '/' expr           { printf("Op - [/ | S].\n"); }
+expr : NUM                     { printf("s - [%s | S].\n", $1); }
+     | ID                      { printf("val - [%s | S].\n", $1); }
+     | expr '+' expr           { printf("op - [+ | S].\n"); }
+     | expr '-' expr           { printf("op - [- | S].\n"); }
+     | expr '*' expr           { printf("op - [* | S].\n"); }
+     | expr '/' expr           { printf("op - [/ | S].\n"); }
      | '(' expr ')'
      ;
 
