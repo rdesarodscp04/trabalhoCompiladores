@@ -27,7 +27,7 @@
     O prolog lê o program.sim e gera codigo sim que depois é convertido para o program.c
 
 ### Comando `make passo4`
-    Aqui compila-se o program.c
+    Aqui compila-se o program.c, no entanto é preciso alterar o lugar onde o codigo está escrito para a aba instructions
 
 ### Comando `make correr`
     Aqui corre-se
