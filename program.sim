@@ -1,6 +1,0 @@
-program: 
-PUSH 1
-PUSH 2
-ADD
-CALL print_int
-

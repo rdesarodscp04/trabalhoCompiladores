@@ -15,10 +15,19 @@
 
 # Comandos
 
-Comando para gerar o codigo c : docker run -i rodalvas/sim2c < program.sim > program.c
+## Resumo dos passos necessários
 
-Comando para gerar o codigo sim: swipl -s calcPP-pl.pl < siuu > program.sim
+### Comando `make passo1`
+    Aqui simplesmente lê-se o input e escreve em build/output através do bison
 
-Comando para escrever as coisas do contas-pl para o siuu: ./calcPP > siuu
+### Comando `make passo2`
+    Aqui lê os comandos passados pelo bison no build/output e escreve o program.sim
 
-Comando para escrever o que resulta do bison:
+### Comando `make passo3`
+    O prolog lê o program.sim e gera codigo sim que depois é convertido para o program.c
+
+### Comando `make passo4`
+    Aqui compila-se o program.c
+
+### Comando `make correr`
+    Aqui corre-se
