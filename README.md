@@ -2,9 +2,9 @@
 
 1. Utilizar o `make all` para dar build no projeto
 
-2. Dentro do directorio build executar o binário `calcPP` com `./calcPP > output`
+2. Executar o binário `calcPP` com `build/./calcPP > build/output`
 
-3. Posteriormente, na raiz do projeto, utilizar o output como input para o programa calcPP-pl.pl para gerar o código sim com
+3. Utilizar o output como input para o programa calcPP-pl.pl para gerar o código sim com
     `swipl -s calcPP-pl.pl < build/output > program.sim`
 
 4. Gerar o código C com `docker run -i rodalvas/sim2c < program.sim > program.c`
