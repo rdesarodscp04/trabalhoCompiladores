@@ -1,4 +1,0 @@
-val - [input | S].
-s - [2 | S].
-op - [* | S].
-s - [print | S].
