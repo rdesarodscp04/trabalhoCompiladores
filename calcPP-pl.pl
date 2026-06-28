@@ -29,7 +29,7 @@ load_apt(end_of_file, Acumulador, Acumulador) :- !,
     write('jump'), nl.
     
 load_apt(_Esquerda - Direita, Acumulador, OUT) :- 
-    Direita = ['input' | _], !,
+    Direita = ['io' | _], !,
     write('DUP'), nl,
     write('PUSH read_int'), nl,
     write('CALL'), nl, 
