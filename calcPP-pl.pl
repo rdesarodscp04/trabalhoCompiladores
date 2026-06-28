@@ -43,9 +43,9 @@ load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     read(X),
     load_apt(X, [push(Instrucao) | Acumulador], OUT).
 
-load_apt('op' - Direita, Acumulador, OUT) :- 
+load_apt('op' - Direita, Acumulador, OUT) :-
     Direita = [Instrucao | _],
-    member(Instrucao, [+, -, *, /]), !,
+    member(Instrucao, [+, -, *, /, '%']), !,
     converte_op(Instrucao, NomeInt),
     write(NomeInt),  nl,
     read(X),
@@ -98,6 +98,7 @@ converte_op('+', 'ADD').
 converte_op('-', 'SUB').
 converte_op('*', 'MUL').
 converte_op('/', 'DIV').
+converte_op('%', 'MOD').
 
 insert(DICT, K, V) :- var(DICT ), !, DICT=[K=V|_].
 insert([K=_|_], K, _) :- !, fail.
