@@ -1,5 +1,14 @@
 
-:- initialization((write('program: '),nl, load_apt(_T),nl, halt)).
+:- initialization((
+    write('.data'), nl,
+    write('foo:	.word	10'),nl,
+    write('.word	20'),nl,
+    write('.word	30'),nl,
+    write('.text'), nl,
+    write('program: '), nl,
+    load_apt(_T),
+    nl,
+    halt)).
 
 :- dynamic prints/1.
 :- dynamic nVariaveis/1.
@@ -15,7 +24,10 @@ load_apt(T) :-
     load_apt(X, [], T).
 
 
-load_apt(end_of_file, Acumulador, Acumulador) :- !.
+load_apt(end_of_file, Acumulador, Acumulador) :- !,
+    write(';end'),nl,
+    write('jump'), nl.
+    
  
 
 load_apt(_Esquerda - Direita, Acumulador, OUT) :- 
@@ -37,6 +49,7 @@ load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     Direita = [print | _], !,
     write('PUSH print_int'), nl,
     write('CALL'), nl,
+    write('POP'),nl,
     read(X),
     load_apt(X, [print | Acumulador], OUT).
 
