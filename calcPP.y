@@ -24,7 +24,7 @@ int yylex();
 
 %right '='
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 
 %%
 
@@ -53,6 +53,7 @@ expr : NUM                     { printf("s - [%s | S].\n", $1); }
      | expr '-' expr           { printf("op - [- | S].\n"); }
      | expr '*' expr           { printf("op - [* | S].\n"); }
      | expr '/' expr           { printf("op - [/ | S].\n"); }
+     | expr '%' expr           { printf("op - ['%%' | S].\n"); }
      | '(' expr ')'
      ;
 
