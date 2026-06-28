@@ -7,7 +7,7 @@
 %%
 
 [0-9]+		          { yylval.string = strdup (yytext); return NUM; }
-[a-z][a-zA-Z0-9_]*  { yylval.string = strdup(yytext); return ID; } 
+[a-z][a-zA-Z0-9_]*    { yylval.string = strdup(yytext); return ID; }
 
 "("		return '(';
 ")"		return ')';

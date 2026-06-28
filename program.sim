@@ -1,0 +1,16 @@
+.data
+foo:	.word	10
+.word	20
+.word	30
+.text
+program: 
+PUSH read_int
+CALL
+PUSH 2
+MUL
+PUSH print_int
+CALL
+POP
+;end
+jump
+

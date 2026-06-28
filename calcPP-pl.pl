@@ -28,7 +28,12 @@ load_apt(end_of_file, Acumulador, Acumulador) :- !,
     write(';end'),nl,
     write('jump'), nl.
     
- 
+load_apt(_Esquerda - Direita, Acumulador, OUT) :- 
+    Direita = ['input' | _], !,
+    write('PUSH read_int'), nl,
+    write('CALL'), nl, 
+    read(X),
+    load_apt(X, ['input' | Acumulador], OUT).
 
 load_apt(_Esquerda - Direita, Acumulador, OUT) :- 
     Direita = [Instrucao | _],
