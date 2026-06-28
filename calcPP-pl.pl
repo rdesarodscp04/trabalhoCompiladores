@@ -30,6 +30,7 @@ load_apt(end_of_file, Acumulador, Acumulador) :- !,
     
 load_apt(_Esquerda - Direita, Acumulador, OUT) :- 
     Direita = ['input' | _], !,
+    write('DUP'), nl,
     write('PUSH read_int'), nl,
     write('CALL'), nl, 
     read(X),
