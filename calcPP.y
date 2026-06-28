@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void yyerror (char const *e) {
   fprintf (stderr, "ouch: %s\n", e);
@@ -30,8 +31,20 @@ int yylex();
 linhas : linha
        | linhas linha ;
 
-linha : expr EOL               { printf("s - [print | S].\n"); fflush(stdout); }
-      | ID '=' expr            { printf("var - [%s | S].\n", $1); fflush(stdout); }
+linha : expr EOL               { }
+      | ID '=' expr            { 
+                                if (strcmp($1, "io") == 0) {
+                            
+                                    printf("s - [print | S].\n"); 
+                                    fflush(stdout);
+
+                                  }else{
+                                        printf("var - [%s | S].\n", $1); 
+                                        fflush(stdout); 
+                                      }
+                                  }
+                                   
+      
       | EOL
 
 expr : NUM                     { printf("s - [%s | S].\n", $1); }
