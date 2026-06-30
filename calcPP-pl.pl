@@ -81,8 +81,11 @@ load_apt('var' - Direita, Acumulador, OUT) :-
     retract(nVariaveis(N)),
     assert(nVariaveis(N1)),
     retract(dicionario(DictAntigo)),         
-    insert(DictAntigo, NomeVar, N),         
-    assert(dicionario(DictAntigo)),
+    
+    % ADICIONAMOS A VARIÁVEL DIRETAMENTE À CABEÇA DA LISTA:
+    DictNovo = [NomeVar=N | DictAntigo],         
+    assert(dicionario(DictNovo)),
+    
     write('PUSH '),write(N), nl,
     write('STORE '), nl,
     read(X),
@@ -135,25 +138,37 @@ load_apt('bloco' - [abre | _], Acumulador, OUT) :- !,
     load_apt(Proximo, Acumulador, OUT).
 
 load_apt('bloco' - [fecha | _], Acumulador, OUT):- !,
+    read(Proximo),
+    trata_fecho_bloco(Proximo, Acumulador, OUT).
+
+trata_fecho_bloco('cond' - [else | _], Acumulador, OUT) :- !,
+    nLabels(N),
+    LEnd is N + 1,
+    retract(nLabels(N)),
+    assert(nLabels(LEnd)),
+
+    write('PUSH L'), write(LEnd), nl,
+    write('JUMP'), nl,
+
     stackLabels(Sl),
+    remove_da_stack(Sl, LabelStartElse, Sl2),
+    write('L'), write(LabelStartElse), write(':'), nl,
 
+    insere_na_stack(LEnd, Sl2, Sl3),
+    retract(stackLabels(Sl)),
+    assert(stackLabels(Sl3)),
+
+    read(DepoisDoElse),
+    load_apt(DepoisDoElse, Acumulador, OUT).
+
+trata_fecho_bloco(Proximo, Acumulador, OUT) :-
+    stackLabels(Sl),
     remove_da_stack(Sl, Label, Sl2),
-
     retract(stackLabels(Sl)),
     assert(stackLabels(Sl2)),
+    
 
-    write('L'),write(Label), write(':'), nl,
-
-    read(X),
-    load_apt(X, Acumulador, OUT).
-
-
-load_apt('cond' - [if | _], Acumulador, OUT) :- !,
-    read(Proximo),
-    load_apt(Proximo, Acumulador, OUT).
-
-load_apt('cond' - [else | _], Acumulador, OUT) :- !,
-    read(Proximo),
+    write('L'), write(Label), write(':'), nl,
     load_apt(Proximo, Acumulador, OUT).
 
 converte_op('+', 'ADD').
@@ -161,10 +176,6 @@ converte_op('-', 'SUB').
 converte_op('*', 'MUL').
 converte_op('/', 'DIV').
 converte_op('%', 'MOD').
-
-insert(DICT, K, V) :- var(DICT ), !, DICT=[K=V|_].
-insert([K=_|_], K, _) :- !, fail.
-insert([_|DICT], K, V) :- insert(DICT, K, V).
 
 lookup(DICT, _, _) :- var(DICT ), !, fail.
 lookup([K=V|_], K, V).

@@ -41,13 +41,18 @@ linha : expr EOL               { }
                                 }
                                }
       
-      | IF '('cond_marcada ')' bloco  {
+      | IF '(' cond_marcada ')' bloco  {
                                 printf("cond - [if | S].\n");
                                 fflush(stdout);
                                }
-      | IF '('cond_marcada ')' bloco ELSE bloco {
-                                printf("cond - [ifelse | S].\n");
+      
+      /* AQUI ESTÁ A ALTERAÇÃO: Ação no meio da regra, logo a seguir ao ELSE */
+      | IF '(' cond_marcada ')' bloco ELSE {
+                                printf("cond - [else | S].\n");
                                 fflush(stdout);
+                               } bloco { 
+                                /* O fim do bloco-else gera o fecho automaticamente,
+                                   por isso não precisamos de imprimir nada extra aqui */
                                }
       | EOL ;
 
