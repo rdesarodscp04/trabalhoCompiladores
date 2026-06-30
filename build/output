@@ -1,0 +1,12 @@
+s - [1 | S].
+condicao - [ fim | S].
+bloco - [abre | S].
+s - [12 | S].
+s - [print | S].
+bloco - [fecha | S].
+bloco - [abre | S].
+s - [123 | S].
+s - [print | S].
+bloco - [fecha | S].
+cond - [ifelse | S].
+end_of_file.
