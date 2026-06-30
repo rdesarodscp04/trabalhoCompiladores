@@ -13,10 +13,14 @@
 :- dynamic prints/1.
 :- dynamic nVariaveis/1.
 :- dynamic dicionario/1.
+:- dynamic nLabels/1.
+:- dynamic stackLabels/1.
 
+nLabels(0).
 prints(0).
 nVariaveis(0).
-dicionario(_).
+dicionario([]).
+stackLabels([]).
 
 
 load_apt(T) :-
@@ -94,6 +98,64 @@ load_apt('val' - Direita, Acumulador, OUT) :-
     read(X),
     load_apt(X, Acumulador, OUT).
 
+
+load_apt('condicao' - [fim | _], Acumulador, OUT) :- ! ,
+    
+    nLabels(N),
+    NFim is N + 1,
+    N2 is N + 2,
+    retract(nLabels(N)),
+    assert(nLabels(N2)),
+
+    write('DUP'),nl,
+    write('DUP'),nl,
+    write('SKIPZ'), nl,
+    write('PUSH L'), write(N), nl,
+    write('SWAP'),nl,
+    write('SKIPZ'),nl,
+    write('SWAP'),nl,
+    write('SKIPZ'), nl,
+    write('JUMP'), nl,
+    
+    write('PUSH L'), write(NFim), nl,
+    write('JUMP'), nl,
+    
+    write('L'),write(N), write(':'), nl,
+
+    stackLabels(Sl),
+    insere_na_stack(NFim,Sl, Sl1),
+    retract(stackLabels(Sl)),
+    assert(stackLabels(Sl1)),
+    read(X),
+    load_apt(X, Acumulador, OUT).
+    
+
+load_apt('bloco' - [abre | _], Acumulador, OUT) :- !,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bloco' - [fecha | _], Acumulador, OUT):- !,
+    stackLabels(Sl),
+
+    remove_da_stack(Sl, Label, Sl2),
+
+    retract(stackLabels(Sl)),
+    assert(stackLabels(Sl2)),
+
+    write('L'),write(Label), write(':'), nl,
+
+    read(X),
+    load_apt(X, Acumulador, OUT).
+
+
+load_apt('cond' - [if | _], Acumulador, OUT) :- !,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('cond' - [else | _], Acumulador, OUT) :- !,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
 converte_op('+', 'ADD').
 converte_op('-', 'SUB').
 converte_op('*', 'MUL').
@@ -108,6 +170,7 @@ lookup(DICT, _, _) :- var(DICT ), !, fail.
 lookup([K=V|_], K, V).
 lookup([_|DICT], K, V) :- lookup(DICT, K, V).
 
-
+insere_na_stack(X, Lista, [X|Lista]).
+remove_da_stack([X|L],X, L).
 
 

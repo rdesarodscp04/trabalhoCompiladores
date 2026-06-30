@@ -1,0 +1,30 @@
+.data
+foo:	.word	10
+.word	20
+.word	30
+.text
+program: 
+PUSH 1
+DUP
+DUP
+SKIPZ
+PUSH L0
+SWAP
+SKIPZ
+SWAP
+SKIPZ
+JUMP
+PUSH L1
+JUMP
+L0:
+PUSH 12
+PUSH print_int
+CALL
+POP
+L1:
+PUSH 21
+PUSH print_int
+CALL
+POP
+
+
