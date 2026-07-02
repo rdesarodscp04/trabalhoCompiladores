@@ -16,8 +16,8 @@ int yylex();
 
 %union { char *string; }
 
-%token EOL
-%token <string> NUM ID IF ELSE
+%token EOL EQ NEQ
+%token <string> NUM ID IF ELSE WHILE
 
 %start linhas
 
@@ -54,6 +54,15 @@ linha : expr EOL               { }
                                 /* O fim do bloco-else gera o fecho automaticamente,
                                    por isso não precisamos de imprimir nada extra aqui */
                                }
+      | WHILE { 
+                printf("ciclo - [inicio | S].\n"); 
+                fflush(stdout); 
+              } 
+      '(' cond_marcada ')' bloco 
+              {
+                printf("ciclo - [fim | S].\n");
+                fflush(stdout);
+              }
       | EOL ;
 
 cond_marcada : expr            { 
@@ -61,6 +70,14 @@ cond_marcada : expr            {
                                 fflush(stdout); 
                                }
              ;
+          
+// implementar expr bool para expressões booleanas
+/*expr_bool : expr              { }
+          | expr '<' expr     { }  
+          | expr '>' expr     { }
+          | expr EQ expr      { }
+          | expr NEQ expr     { }
+          ;*/
 
 bloco : 
       | '{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
