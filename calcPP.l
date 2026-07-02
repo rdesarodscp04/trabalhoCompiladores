@@ -10,8 +10,8 @@
 
 if                     { return IF; }
 else                   { return ELSE; }
-EQ                     { return EQ; }
-NEQ                    { return NEQ; }
+"=="                     { return EQ; }
+"/="                    { return NEQ; }
 while                  { return WHILE; }
 
 [a-z][a-zA-Z0-9_]*    { yylval.string = strdup(yytext); return ID; }

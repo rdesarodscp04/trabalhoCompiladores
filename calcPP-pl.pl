@@ -15,12 +15,19 @@
 :- dynamic dicionario/1.
 :- dynamic nLabels/1.
 :- dynamic stackLabels/1.
+:- dynamic label_equals/1.
+:- dynamic label_while/1.
+:- dynamic stackWhile/1.
 
+label_while(0).
 nLabels(0).
+label_equals(0).
 prints(0).
 nVariaveis(0).
 dicionario([]).
 stackLabels([]).
+while_condition([]).
+stackWhile([]).
 
 
 load_apt(T) :-
@@ -74,15 +81,14 @@ load_apt('var' - Direita, Acumulador, OUT) :-
    
 
 %Guardar valor
-load_apt('var' - Direita, Acumulador, OUT) :-
+load_apt('var' - Direita, Acumulador, OUT) :- 
     Direita = [NomeVar | _],
     nVariaveis(N),
     N1 is N + 1,
     retract(nVariaveis(N)),
     assert(nVariaveis(N1)),
     retract(dicionario(DictAntigo)),         
-    
-    % ADICIONAMOS A VARIÁVEL DIRETAMENTE À CABEÇA DA LISTA:
+
     DictNovo = [NomeVar=N | DictAntigo],         
     assert(dicionario(DictNovo)),
     
@@ -92,7 +98,7 @@ load_apt('var' - Direita, Acumulador, OUT) :-
     load_apt(X, Acumulador, OUT).
 
 %Carregar valor
-load_apt('val' - Direita, Acumulador, OUT) :-
+load_apt('val' - Direita, Acumulador, OUT) :- !,
     Direita = [NomeVar | _],
     dicionario(Dict),         
     lookup(Dict, NomeVar, N),         
@@ -141,6 +147,72 @@ load_apt('bloco' - [fecha | _], Acumulador, OUT):- !,
     read(Proximo),
     trata_fecho_bloco(Proximo, Acumulador, OUT).
 
+load_apt('cond' - [if | _], Acumulador, OUT):- !,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - [< | _], Acumulador, OUT) :- !,
+    write('SLT '), nl,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - [> | _], Acumulador, OUT) :- !,
+    write('SWAP'), nl,
+    write('SLT '), nl,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - [Simbolo | _], Acumulador, OUT) :- !,
+
+    member(Simbolo, ['==', '/=']),
+    label_equals(N),
+    N1 is N + 1,
+    N2 is N + 2,
+    retract(label_equals(N)),
+    assert(label_equals(N2)),
+
+    write('SUB'), nl,             
+    write('PUSH E'), write(N), nl,
+    write('SWAP'), nl,
+    write('SKIPZ'), nl,           
+    write('JUMP'), nl,         
+    
+    write('POP'), nl,             
+    (Simbolo == '==' -> write('PUSH 1') ; write('PUSH 0')), nl,
+    write('PUSH E'), write(N1), nl,
+    write('JUMP'), nl,           
+    
+    write('E'), write(N), write(':'), nl,
+    (Simbolo == '==' -> write('PUSH 0') ; write('PUSH 1')), nl,
+    
+    write('E'), write(N1), write(':'), nl,
+    
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('while' - [inicio | _], Acumulador, OUT) :- !,
+
+    label_while(N),
+    N1 is N + 1,
+    retract(label_while(N)),
+    assert(label_while(N1)),
+
+    
+    stackWhile(Sw),
+    insere_na_stack(N, Sw, Sw1),
+    retract(stackWhile(Sw)),
+    assert(stackWhile(Sw1)),
+
+    
+    write('W'), write(N), write(':'), nl,
+    
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+
+
+
+
 trata_fecho_bloco('cond' - [else | _], Acumulador, OUT) :- !,
     nLabels(N),
     LEnd is N + 1,
@@ -161,6 +233,26 @@ trata_fecho_bloco('cond' - [else | _], Acumulador, OUT) :- !,
     read(DepoisDoElse),
     load_apt(DepoisDoElse, Acumulador, OUT).
 
+trata_fecho_bloco('while' - [fim | _], Acumulador, OUT) :- !,
+
+    stackWhile(Sw),
+    remove_da_stack(Sw, WLabel, Sw2),
+    retract(stackWhile(Sw)),
+    assert(stackWhile(Sw2)),
+
+    write('PUSH W'), write(WLabel), nl,
+    write('JUMP'), nl,
+
+    stackLabels(Sl),
+    remove_da_stack(Sl, ExitLabel, Sl2),
+    retract(stackLabels(Sl)),
+    assert(stackLabels(Sl2)),
+
+    write('L'), write(ExitLabel), write(':'), nl,
+
+    read(DepoisDoWhile),
+    load_apt(DepoisDoWhile, Acumulador, OUT).
+
 trata_fecho_bloco(Proximo, Acumulador, OUT) :-
     stackLabels(Sl),
     remove_da_stack(Sl, Label, Sl2),
@@ -170,6 +262,10 @@ trata_fecho_bloco(Proximo, Acumulador, OUT) :-
 
     write('L'), write(Label), write(':'), nl,
     load_apt(Proximo, Acumulador, OUT).
+
+
+
+
 
 converte_op('+', 'ADD').
 converte_op('-', 'SUB').
