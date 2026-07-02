@@ -46,38 +46,35 @@ linha : expr EOL               { }
                                 fflush(stdout);
                                }
       
-      /* AQUI ESTÁ A ALTERAÇÃO: Ação no meio da regra, logo a seguir ao ELSE */
+      
       | IF '(' cond_marcada ')' bloco ELSE {
                                 printf("cond - [else | S].\n");
                                 fflush(stdout);
                                } bloco { 
-                                /* O fim do bloco-else gera o fecho automaticamente,
-                                   por isso não precisamos de imprimir nada extra aqui */
                                }
       | WHILE { 
-                printf("ciclo - [inicio | S].\n"); 
+                printf("while - [inicio | S].\n"); 
                 fflush(stdout); 
               } 
       '(' cond_marcada ')' bloco 
               {
-                printf("ciclo - [fim | S].\n");
+                printf("while - [fim | S].\n");
                 fflush(stdout);
               }
       | EOL ;
 
-cond_marcada : expr            { 
-                                printf("condicao - [ fim | S].\n"); 
+cond_marcada : expr_bool            { 
+                                printf("condicao - [fim | S].\n"); 
                                 fflush(stdout); 
                                }
              ;
           
-// implementar expr bool para expressões booleanas
-/*expr_bool : expr              { }
-          | expr '<' expr     { }  
-          | expr '>' expr     { }
-          | expr EQ expr      { }
-          | expr NEQ expr     { }
-          ;*/
+expr_bool : expr              { }
+          | expr '<' expr     {printf("bool - [< | S].\n"); }  
+          | expr '>' expr     { printf("bool - [> | S].\n"); }
+          | expr EQ expr      {printf("bool - [== | S].\n");  }
+          | expr NEQ expr     {printf("bool - [/= | S].\n");  }
+          ;
 
 bloco : 
       | '{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
