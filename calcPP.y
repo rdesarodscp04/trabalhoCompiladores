@@ -16,8 +16,8 @@ int yylex();
 
 %union { char *string; }
 
-%token EOL
-%token <string> NUM ID IF ELSE
+%token EOL EQ NEQ
+%token <string> NUM ID IF ELSE WHILE
 
 %start linhas
 
@@ -41,14 +41,28 @@ linha : expr EOL               { }
                                 }
                                }
       
-      | IF '('cond_marcada ')' bloco  {
+      | IF '(' cond_marcada ')' bloco  {
                                 printf("cond - [if | S].\n");
                                 fflush(stdout);
                                }
-      | IF '('cond_marcada ')' bloco ELSE bloco {
-                                printf("cond - [ifelse | S].\n");
+      
+      /* AQUI ESTÁ A ALTERAÇÃO: Ação no meio da regra, logo a seguir ao ELSE */
+      | IF '(' cond_marcada ')' bloco ELSE {
+                                printf("cond - [else | S].\n");
                                 fflush(stdout);
+                               } bloco { 
+                                /* O fim do bloco-else gera o fecho automaticamente,
+                                   por isso não precisamos de imprimir nada extra aqui */
                                }
+      | WHILE { 
+                printf("ciclo - [inicio | S].\n"); 
+                fflush(stdout); 
+              } 
+      '(' cond_marcada ')' bloco 
+              {
+                printf("ciclo - [fim | S].\n");
+                fflush(stdout);
+              }
       | EOL ;
 
 cond_marcada : expr            { 
@@ -56,6 +70,14 @@ cond_marcada : expr            {
                                 fflush(stdout); 
                                }
              ;
+          
+// implementar expr bool para expressões booleanas
+/*expr_bool : expr              { }
+          | expr '<' expr     { }  
+          | expr '>' expr     { }
+          | expr EQ expr      { }
+          | expr NEQ expr     { }
+          ;*/
 
 bloco : 
       | '{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
