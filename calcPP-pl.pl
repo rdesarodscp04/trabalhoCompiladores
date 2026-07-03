@@ -162,6 +162,44 @@ load_apt('bool' - [> | _], Acumulador, OUT) :- !,
     read(Proximo),
     load_apt(Proximo, Acumulador, OUT).
 
+load_apt('bool' - [>= | _], Acumulador, OUT) :- !,
+    write('SUB'), nl,
+    write('PUSH -1'), nl,
+    write('SWAP'), nl,
+    write('SLT '), nl,
+
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - [<= | _], Acumulador, OUT) :- !,
+    write('SUB'), nl,
+    write('PUSH 1'), nl,
+    write('SLT '), nl,
+
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - ['&&' | _], Acumulador, OUT) :- !,
+    write('MUL'), nl,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - [or | _], Acumulador, OUT) :- !,
+    write('ADD'), nl,
+    write('PUSH 0'), nl,
+    write('SWAP'), nl,
+    write('SLT '), nl,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt('bool' - [<= | _], Acumulador, OUT) :- !,
+    write('SUB'), nl,
+    write('PUSH 1'), nl,
+    write('SLT '), nl,
+
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
 load_apt('bool' - [Simbolo | _], Acumulador, OUT) :- !,
 
     member(Simbolo, ['==', '/=']),
