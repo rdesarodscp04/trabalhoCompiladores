@@ -16,7 +16,7 @@ int yylex();
 
 %union { char *string; }
 
-%token EOL EQ NEQ
+%token EOL EQ NEQ IO GE LE
 %token <string> NUM ID IF ELSE WHILE
 
 %start linhas
@@ -31,14 +31,10 @@ linhas : linha
        | linhas linha ;
 
 linha : expr EOL               { }
+      | IO '=' expr            { printf("s - [print | S].\n");  fflush(stdout); }
       | ID '=' expr            { 
-                                if (strcmp($1, "io") == 0) {
-                                    printf("s - [print | S].\n"); 
-                                    fflush(stdout);
-                                } else {
                                     printf("var - [%s | S].\n", $1); 
-                                    fflush(stdout); 
-                                }
+                                    fflush(stdout);
                                }
       
       | IF '(' cond_marcada ')' bloco  {
@@ -74,6 +70,8 @@ expr_bool : expr              { }
           | expr '>' expr     { printf("bool - [> | S].\n"); }
           | expr EQ expr      {printf("bool - [== | S].\n");  }
           | expr NEQ expr     {printf("bool - [/= | S].\n");  }
+          | expr GE expr      { printf("bool - [>= | S].\n"); }
+          | expr LE expr      { printf("bool - [<= | S].\n"); }
           ;
 
 bloco : 
