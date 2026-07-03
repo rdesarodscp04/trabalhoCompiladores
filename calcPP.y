@@ -42,7 +42,7 @@ int yylex();
 
 %union { char *string; }  
 
-%token EOL EQ NEQ IO GE LE IF ELSE WHILE
+%token EOL EQ NEQ IO GE LE IF ELSE WHILE AND OR
 %token <string> NUM ID
 
 %start linhas
@@ -50,6 +50,9 @@ int yylex();
 %right '='
 %left '+' '-'
 %left '*' '/' '%'
+
+%left OR
+%left AND
 
 %%
 
@@ -99,11 +102,15 @@ expr_bool : expr              { }
           | expr NEQ expr     {printf("bool - [/= | S].\n");  }
           | expr GE expr      { printf("bool - [>= | S].\n"); }
           | expr LE expr      { printf("bool - [<= | S].\n"); }
+          | expr_bool AND expr_bool { printf("bool - [&& | S].\n"); }
+          | expr_bool OR expr_bool  { printf("bool - [or | S].\n"); }
+          | '(' expr_bool ')'       { }
           ;
 
 bloco : '{' { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco - [fecha | S].\n"); fflush(stdout); } '}'
       | '{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
       | '{'  { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
+      |'{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco - [fecha | S].\n"); fflush(stdout); } '}'
       ;
 
 expr : NUM                     { converter_int($1); printf("s - [%s | S].\n", $1); }

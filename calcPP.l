@@ -16,6 +16,8 @@ while                  { return WHILE; }
 ">="                    { return GE; }
 "<="                    { return LE; }
 io                   { return IO; }
+"&&"    { return AND; }
+"||"    { return OR; }
 
 
 [a-z][a-zA-Z0-9_]*    { yylval.string = strdup(yytext); return ID; }
