@@ -20,6 +20,11 @@ io                   { return IO; }
 
 [a-z][a-zA-Z0-9_]*    { yylval.string = strdup(yytext); return ID; }
 
+[0-9]+[a-zA-Z_][a-zA-Z0-9_]*   { 
+                                    fprintf(stderr, "Erro Léxico: '%s' não é um inteiro válido!\n", yytext); 
+                                    exit(1); 
+                               }
+
 "<"   return '<';
 ">"   return '>';
 
@@ -38,5 +43,6 @@ io                   { return IO; }
 \n		return EOL;
 
 [ \t]+		{}
+"#"([^\\\n]|\\.)* { /* ignora o comentário */ }
 
 %%
