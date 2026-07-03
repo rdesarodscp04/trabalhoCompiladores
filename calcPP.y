@@ -8,14 +8,14 @@
 #include <stdbool.h>
 
 void yyerror (char const *e) {
-  fprintf (stderr, "ouch: %s\n", e);
+  fprintf (stderr, "Alerta: %s\n", e);
   exit(1);
 }
 
-void converter_int(const char * num) {
+void converter_int(const char *num) {
 
   if ( *num == '\0' || num == NULL )
-    yyerror("Semantic Error: Valor da varivel invalido ou Sistema sem espaço");
+    yyerror("Erro de Semantica: Valor da varivel invalido ou Sistema sem espaço");
 
   char *endPtr;
   errno = 0;
@@ -23,16 +23,16 @@ void converter_int(const char * num) {
   long valor_long = strtol(num, &endPtr, 10);
 
   if ( errno == ERANGE )
-    yyerror("Semantic: Valor lido excede o valor maximo de um inteiro");
+    yyerror("Erro de Semantica: Valor lido excede o valor maximo de um inteiro");
 
   if ( endPtr == num )
-    yyerror("Semantic Error: O dominio de valores a atribuir deve ser o conjunto dos numeros inteiros ");
+    yyerror("Erro de Semantica: O dominio de valores a atribuir deve ser o conjunto dos numeros inteiros ");
   
   if ( *endPtr != '\0' && *endPtr != '\n' )
-    yyerror("Semantic Error: O valor da variavel deve ser todo inteiro! ");
+    yyerror("Erro de Semantica: O valor da variavel deve ser todo inteiro! ");
   
   if(valor_long < INT_MIN || valor_long > INT_MAX)
-    yyerror("Semantic Error: Valor excede o valor admitido por um inteiro!");
+    yyerror("Erro de Semantica: Valor excede o valor admitido por um inteiro!");
 }
 
 void yywrap() {}
@@ -42,8 +42,8 @@ int yylex();
 
 %union { char *string; }  
 
-%token EOL EQ NEQ IO GE LE
-%token <string> NUM ID IF ELSE WHILE
+%token EOL EQ NEQ IO GE LE IF ELSE WHILE
+%token <string> NUM ID
 
 %start linhas
 
@@ -83,14 +83,15 @@ linha : expr EOL               { }
                 printf("while - [fim | S].\n");
                 fflush(stdout);
               }
-      | EOL ;
+      | EOL  { }
+      ;
 
 cond_marcada : expr_bool            { 
                                 printf("condicao - [fim | S].\n"); 
                                 fflush(stdout); 
                                }
              ;
-          
+        
 expr_bool : expr              { }
           | expr '<' expr     {printf("bool - [< | S].\n"); }  
           | expr '>' expr     { printf("bool - [> | S].\n"); }
@@ -100,7 +101,7 @@ expr_bool : expr              { }
           | expr LE expr      { printf("bool - [<= | S].\n"); }
           ;
 
-bloco : 
+bloco : '{' { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco - [fecha | S].\n"); fflush(stdout); } '}'
       | '{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
       | '{'  { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
       ;
