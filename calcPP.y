@@ -98,7 +98,12 @@ print : expr_bool { printf("s - [print | S].\n"); fflush(stdout); }
       | PALAVRAS { 
 
         for(int i = 1; i < strlen($1) - 1; i++){
+          if($1[i] == ' '){
+            printf("print_char(espaco).\n");
+          }else{
+
           printf("print_char(%c).\n", $1[i]);
+          }
 
         }
         fflush(stdout); 
