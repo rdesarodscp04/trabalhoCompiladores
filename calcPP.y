@@ -43,7 +43,7 @@ int yylex();
 %union { char *string; }  
 
 %token EOL EQ NEQ IO GE LE IF ELSE WHILE AND OR
-%token <string> NUM ID
+%token <string> NUM ID PALAVRAS
 
 %start linhas
 
@@ -59,8 +59,12 @@ int yylex();
 linhas : linha
        | linhas linha ;
 
-linha : expr EOL               { }
-      | IO '=' expr_bool            { printf("s - [print | S].\n");  fflush(stdout); }
+
+prints : print
+      | prints print
+      | EOL  { };
+
+linha : expr EOL               {}
       | ID '=' expr            { 
                                     printf("var - [%s | S].\n", $1); 
                                     fflush(stdout);
@@ -86,8 +90,21 @@ linha : expr EOL               { }
                 printf("while - [fim | S].\n");
                 fflush(stdout);
               }
+      |IO '=' prints {}
       | EOL  { }
       ;
+
+print : expr_bool { printf("s - [print | S].\n"); fflush(stdout); }
+      | PALAVRAS { 
+
+        for(int i = 1; i < strlen($1) - 1; i++){
+          printf("print_char(%c).\n", $1[i]);
+
+        }
+        fflush(stdout); 
+        }
+      ;
+
 
 cond_marcada : expr_bool            { 
                                 printf("condicao - [fim | S].\n"); 
@@ -114,6 +131,7 @@ bloco : '{' { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco
       ;
 
 expr : NUM                     { converter_int($1); printf("s - [%s | S].\n", $1); }
+    | IO                        {printf("val - [io | S].\n");}
      | ID                      { printf("val - [%s | S].\n", $1); }
      | expr '+' expr           { printf("op - [+ | S].\n"); }
      | expr '-' expr           { printf("op - [- | S].\n"); }

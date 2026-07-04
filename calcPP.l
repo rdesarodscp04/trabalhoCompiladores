@@ -7,6 +7,7 @@
 %%
 
 [0-9]+		          { yylval.string = strdup (yytext); return NUM; }
+\"[^\"]*\"              { yylval.string = strdup(yytext); return PALAVRAS; }
 
 if                     { return IF; }
 else                   { return ELSE; }
