@@ -38,7 +38,7 @@ static void atualizar_localizacao() {
 
 static void erro_tamanho(const char *tipo, int n, int max) {
     fprintf(stderr,
-            "Erro Léxico: %s demasiado longo (%zu caracteres, máximo permitido = %zu)\n",
+            "\033[1;31mErro Léxico: %s demasiado longo (%d caracteres, máximo permitido = %d)\033[0m\n",
             tipo, n, max);
     exit(1);
 }
@@ -50,7 +50,7 @@ static void erro_tamanho(const char *tipo, int n, int max) {
 if                                { return IF; }
 else                              { return ELSE; }
 while                             { return WHILE; }
-io                                { return IO; }
+io                                { return PRINT; }
 
 [a-z][a-zA-Z0-9_]* {
     int n = strlen(yytext);
@@ -76,11 +76,11 @@ io                                { return IO; }
         erro_tamanho("String", n, MAX_STR);
 
     yylval.string = strdup(yytext);
-    return PALAVRAS;
+    return STRING;
 }
 
 [0-9]+[a-zA-Z_][a-zA-Z0-9_]* {
-    fprintf(stderr, "Erro Léxico: '%s' não é um inteiro válido!\n", yytext);
+    fprintf(stderr, "\033[1;31mErro Léxico: '%s' não é um inteiro válido!\033[0m\n", yytext);
     exit(1);
 }
 
@@ -110,10 +110,8 @@ io                                { return IO; }
 [ \t]+                             {}
 
 "#"([^\\\n]|\\.)*                  {}
-
 . {
-    fprintf(stderr, "Erro Léxico: caracter inesperado '%s'\n", yytext);
+    fprintf(stderr, "\033[1;31mErro Léxico: caracter inesperado '%s'\033[0m\n", yytext);
     exit(1);
 }
-
 %%
