@@ -132,6 +132,7 @@ instrucoes_opcional
 expr
     : NUM                   { valida_inteiro($1); printf("s - [%s | S].\n", $1); }
     | ID                    { printf("val - [%s | S].\n", $1); }
+    | PRINT                 { printf("val - [io | S].\n"); }
     | expr '+' expr         { printf("op - [+ | S].\n"); }
     | expr '-' expr         { printf("op - [- | S].\n"); }
     | expr '*' expr         { printf("op - [* | S].\n"); }
