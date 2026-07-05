@@ -7,45 +7,33 @@
 #include <limits.h>
 #include <stdbool.h>
 
-void yyerror (char const *e) {
-  fprintf (stderr, "Alerta: %s\n", e);
-  exit(1);
+int yylex(void);
+int yywrap(void) { return 1; }   
+
+void yyerror(char const *e);
+void valida_inteiro(const char *num);
+void print_string(char *string);
+
+void print_string(char *string) {
+    int tamanho_string = strlen(string) - 1;
+
+    for(int i = 1; i < tamanho_string ; i++){
+        if(string[i] == ' '){
+            printf("print_char(espaco).\n");
+        }else{
+            printf("print_char(%c).\n", string[i]);
+        }
+    }
 }
-
-void converter_int(const char *num) {
-
-  if ( *num == '\0' || num == NULL )
-    yyerror("Erro de Semantica: Valor da varivel invalido ou Sistema sem espaço");
-
-  char *endPtr;
-  errno = 0;
-
-  long valor_long = strtol(num, &endPtr, 10);
-
-  if ( errno == ERANGE )
-    yyerror("Erro de Semantica: Valor lido excede o valor maximo de um inteiro");
-
-  if ( endPtr == num )
-    yyerror("Erro de Semantica: O dominio de valores a atribuir deve ser o conjunto dos numeros inteiros ");
-  
-  if ( *endPtr != '\0' && *endPtr != '\n' )
-    yyerror("Erro de Semantica: O valor da variavel deve ser todo inteiro! ");
-  
-  if(valor_long < INT_MIN || valor_long > INT_MAX)
-    yyerror("Erro de Semantica: Valor excede o valor admitido por um inteiro!");
-}
-
-void yywrap() {}
-int yylex();
 
 %}
 
 %union { char *string; }  
 
 %token EOL EQ NEQ IO GE LE IF ELSE WHILE AND OR
-%token <string> NUM ID PALAVRAS
+%token <string> NUM ID
 
-%start linhas
+%start programa
 
 %right '='
 %left '+' '-'
@@ -56,15 +44,13 @@ int yylex();
 
 %%
 
-linhas : linha
-       | linhas linha ;
+programa
+    : instrucao
+    | programa instrucao
+    ;
 
-
-prints : print
-      | prints print
-      | EOL  { };
-
-linha : expr EOL               {}
+linha : expr EOL               { }
+      | IO '=' expr_bool            { printf("s - [print | S].\n");  fflush(stdout); }
       | ID '=' expr            { 
                                     printf("var - [%s | S].\n", $1); 
                                     fflush(stdout);
@@ -90,26 +76,8 @@ linha : expr EOL               {}
                 printf("while - [fim | S].\n");
                 fflush(stdout);
               }
-      |IO '=' prints {}
       | EOL  { }
       ;
-
-print : expr_bool { printf("s - [print | S].\n"); fflush(stdout); }
-      | PALAVRAS { 
-
-        for(int i = 1; i < strlen($1) - 1; i++){
-          if($1[i] == ' '){
-            printf("print_char(espaco).\n");
-          }else{
-
-          printf("print_char(%c).\n", $1[i]);
-          }
-
-        }
-        fflush(stdout); 
-        }
-      ;
-
 
 cond_marcada : expr_bool            { 
                                 printf("condicao - [fim | S].\n"); 
@@ -136,7 +104,6 @@ bloco : '{' { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco
       ;
 
 expr : NUM                     { converter_int($1); printf("s - [%s | S].\n", $1); }
-    | IO                        {printf("val - [io | S].\n");}
      | ID                      { printf("val - [%s | S].\n", $1); }
      | expr '+' expr           { printf("op - [+ | S].\n"); }
      | expr '-' expr           { printf("op - [- | S].\n"); }
