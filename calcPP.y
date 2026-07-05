@@ -11,7 +11,7 @@ int yylex(void);
 int yywrap(void) { return 1; }   
 
 void yyerror(char const *e);
-void isInteger(const char *num);
+void valida_inteiro(const char *num);
 void print_string(char *string);
 
 void print_string(char *string) {
@@ -30,12 +30,12 @@ void print_string(char *string) {
 
 %union { char *string; }  
 
-%token EOL EQ NEQ IO GE LE IF ELSE WHILE AND OR
-%token <string> NUM ID PALAVRAS
+%token EOL EQ NEQ PRINT GE LE IF ELSE WHILE AND OR
+%token <string> NUM ID STRING
 
 %locations
 
-%start linhas
+%start programa
 
 %right '='
 %left '+' '-'
@@ -46,30 +46,30 @@ void print_string(char *string) {
 
 %%
 
-linhas
-    : linha
-    | linhas linha
+programa
+    : instrucao
+    | programa instrucao
     ;
 
-prints : print
-      | prints print
+lista_impressoes : item_impressao
+      | lista_impressoes item_impressao
       | EOL  { };
 
-print : expr_bool { printf("s - [print | S].\n"); fflush(stdout); }
-      | PALAVRAS { 
+item_impressao : expr_condicional { printf("s - [print | S].\n"); fflush(stdout); }
+      | STRING { 
         print_string($1);        
         fflush(stdout); 
         }
       ;
 
-linha
+instrucao
     : expr eol_opcional            { }
     | ID '=' expr                  { printf("var - [%s | S].\n", $1); fflush(stdout); }
-    | IF '(' cond_marcada ')' eol_opcional bloco {
+    | IF '(' condicao ')' eol_opcional bloco {
                                         printf("cond - [if | S].\n");
                                         fflush(stdout);
                                     }
-    | IF '(' cond_marcada ')' eol_opcional bloco ELSE eol_opcional {
+    | IF '(' condicao ')' eol_opcional bloco ELSE eol_opcional {
                                         printf("cond - [else | S].\n");
                                         fflush(stdout);
                                     } bloco
@@ -79,23 +79,23 @@ linha
                                         printf("while - [inicio | S].\n");
                                         fflush(stdout);
                                     }
-      '(' cond_marcada ')' eol_opcional bloco
+      '(' condicao ')' eol_opcional bloco
                                     {
                                         printf("while - [fim | S].\n");
                                         fflush(stdout);
                                     }
-    | IO '=' prints eol_opcional    { }
+    | PRINT '=' lista_impressoes eol_opcional    { }
     | EOL                           { }
     ;
 
-cond_marcada
-    : expr_bool                    {
+condicao
+    : expr_condicional                    {
                                         printf("condicao - [fim | S].\n");
                                         fflush(stdout);
                                     }
     ;
 
-expr_bool
+expr_condicional
     : expr                                  { }
     | expr '<' expr                         { printf("bool - [< | S].\n"); }
     | expr '>' expr                         { printf("bool - [> | S].\n"); }
@@ -103,9 +103,9 @@ expr_bool
     | expr NEQ expr                         { printf("bool - [/= | S].\n"); }
     | expr GE expr                          { printf("bool - [>= | S].\n"); }
     | expr LE expr                          { printf("bool - [<= | S].\n"); }
-    | expr_bool AND expr_bool               { printf("bool - [&& | S].\n"); }
-    | expr_bool OR expr_bool                { printf("bool - [or | S].\n"); }
-    | '(' expr_bool ')'                     { }
+    | expr_condicional AND expr_condicional { printf("bool - [&& | S].\n"); }
+    | expr_condicional OR expr_condicional  { printf("bool - [or | S].\n"); }
+    | '(' expr_condicional ')'              { }
     ;
 
 eol_opcional
@@ -118,19 +118,19 @@ bloco
                                          printf("bloco - [abre | S].\n");
                                          fflush(stdout);
                                      }
-      linhas_opcional '}'           {
+      instrucoes_opcional '}'       {
                                          printf("bloco - [fecha | S].\n");
                                          fflush(stdout);
                                      }
     ;
 
-linhas_opcional
+instrucoes_opcional
     : /* vazio */
-    | linhas
+    | programa
     ;
 
 expr
-    : NUM                   { isInteger($1); printf("s - [%s | S].\n", $1); }
+    : NUM                   { valida_inteiro($1); printf("s - [%s | S].\n", $1); }
     | ID                    { printf("val - [%s | S].\n", $1); }
     | expr '+' expr         { printf("op - [+ | S].\n"); }
     | expr '-' expr         { printf("op - [- | S].\n"); }
@@ -157,10 +157,10 @@ void yyerror(char const *e) {
     exit(1);
 }
 
-void isInteger(const char *num) {
+void valida_inteiro(const char *num) {
 
     if (num == NULL || *num == '\0')
-        yyerror("Erro de Semantica - Valor da variavel invalido ou Sistema sem espaco");
+        yyerror("\033[1;31mErro de Semantica - Valor da variavel invalido ou Sistema sem espaco\033[0m");
 
     char *endPtr;
     errno = 0;
@@ -168,16 +168,16 @@ void isInteger(const char *num) {
     long valor_long = strtol(num, &endPtr, 10);
 
     if (errno == ERANGE)
-        yyerror("Erro de Semantica - Valor lido excede o valor maximo de um inteiro");
+        yyerror("\033[1;31mErro de Semantica - Valor lido excede o valor maximo de um inteiro\033[0m");
 
     if (endPtr == num)
-        yyerror("Erro de Semantica - O dominio de valores a atribuir deve ser o conjunto dos numeros inteiros");
+        yyerror("\033[1;31mErro de Semantica - O dominio de valores a atribuir deve ser o conjunto dos numeros inteiros\033[0m");
 
     if (*endPtr != '\0' && *endPtr != '\n')
-        yyerror("Erro de Semantica - O valor da variavel deve ser todo inteiro!");
+        yyerror("\033[1;31mErro de Semantica - O valor da variavel deve ser todo inteiro!\033[0m");
 
     if (valor_long < INT_MIN || valor_long > INT_MAX)
-        yyerror("Erro de Semantica - Valor excede o valor admitido por um inteiro!");
+        yyerror("\033[1;31mErro de Semantica - Valor excede o valor admitido por um inteiro!\033[0m");
 }
 
 int main(int argc, char **argv) {
