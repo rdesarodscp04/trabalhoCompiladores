@@ -62,6 +62,27 @@ load_apt('op' - Direita, Acumulador, OUT) :-
     read(X),
     load_apt(X, [op(Instrucao) | Acumulador], OUT).
 
+load_apt(print_char('espaco'), Acumulador, OUT) :- !,
+    
+    write('PUSH '), write(32), write(''), nl,
+    write('PUSH print_char'), nl,
+    write('CALL'), nl,
+    write('POP'),nl,
+    
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
+load_apt(print_char(Valor), Acumulador, OUT) :- !,
+    
+    char_code(Valor, Codigo),
+    write('PUSH '), write(Codigo), write(''), nl,
+    write('PUSH print_char'), nl,
+    write('CALL'), nl,
+    write('POP'),nl,
+    
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
+
 load_apt(_Esquerda - Direita, Acumulador, OUT) :-
     Direita = [print | _], !,
     write('PUSH print_int'), nl,
