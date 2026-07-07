@@ -139,6 +139,8 @@ expr
     | expr '/' expr         { printf("op - [/ | S].\n"); }
     | expr '%' expr         { printf("op - ['%%' | S].\n"); }
     | '(' expr ')'          { }
+    | '-' expr              {   
+                                printf("op - [inverso | S].\n"); }
     ;
 
 %%

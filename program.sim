@@ -1,0 +1,15 @@
+.data
+foo:	.word	10
+.word	20
+.word	30
+.text
+program: 
+PUSH 213
+PUSH 13
+SUB
+PUSH print_int
+CALL
+POP
+;end
+jump
+

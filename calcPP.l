@@ -61,7 +61,7 @@ io                                { return PRINT; }
     return ID;
 }
 
-[0-9]+ {
+"-"?[0-9]+ {
     int n = strlen(yytext);
     if (n > MAX_NUM)
         erro_tamanho("Número", n, INT_MAX);
