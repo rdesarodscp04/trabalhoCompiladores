@@ -42,6 +42,8 @@ void print_string(char *string) {
 %left '*' '/' '%'
 %left menos
 
+nonasac '<' '>' LE LG EQ NEQ
+
 %left OR
 %left AND
 
@@ -54,7 +56,7 @@ programa
 
 lista_impressoes : item_impressao
       | lista_impressoes item_impressao
-      | EOL  { };
+      ;
 
 item_impressao : expr_condicional { printf("s - [print | S].\n"); fflush(stdout); }
       | STRING { 
@@ -139,9 +141,8 @@ expr
     | expr '*' expr         { printf("op - [* | S].\n"); }
     | expr '/' expr         { printf("op - [/ | S].\n"); }
     | expr '%' expr         { printf("op - ['%%' | S].\n"); }
+    | '-' expr %prec menos  { printf("op - [inverso | S].\n"); }
     | '(' expr ')'          { }
-    | '-' expr %prec menos            {   
-                                printf("op - [inverso | S].\n"); }
     ;
 
 %%
