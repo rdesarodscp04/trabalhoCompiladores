@@ -40,6 +40,7 @@ void print_string(char *string) {
 %right '='
 %left '+' '-'
 %left '*' '/' '%'
+%left menos
 
 %left OR
 %left AND
@@ -139,7 +140,7 @@ expr
     | expr '/' expr         { printf("op - [/ | S].\n"); }
     | expr '%' expr         { printf("op - ['%%' | S].\n"); }
     | '(' expr ')'          { }
-    | '-' expr              {   
+    | '-' expr %prec menos            {   
                                 printf("op - [inverso | S].\n"); }
     ;
 

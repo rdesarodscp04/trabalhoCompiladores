@@ -4,9 +4,17 @@ foo:	.word	10
 .word	30
 .text
 program: 
-PUSH 213
-PUSH 13
-SUB
+PUSH 111
+PUSH 0
+STORE 
+PUSH 0
+LOAD 
+PUSH -1
+MUL
+PUSH 1
+STORE 
+PUSH 1
+LOAD 
 PUSH print_int
 CALL
 POP
