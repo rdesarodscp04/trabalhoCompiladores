@@ -47,10 +47,8 @@ static void erro_tamanho(const char *tipo, int n, int max) {
 
 %%
 
-if                                { return IF; }
-else                              { return ELSE; }
-while                             { return WHILE; }
-io                                { return PRINT; }
+[0-9]+		          { yylval.string = strdup (yytext); return NUM; }
+\"[^\"]*\"              { yylval.string = strdup(yytext); return PALAVRAS; }
 
 [a-z][a-zA-Z0-9_]* {
     int n = strlen(yytext);

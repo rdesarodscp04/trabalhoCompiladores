@@ -30,10 +30,8 @@ void print_string(char *string) {
 
 %union { char *string; }  
 
-%token EOL EQ NEQ PRINT GE LE IF ELSE WHILE AND OR
-%token <string> NUM ID STRING
-
-%locations
+%token EOL EQ NEQ IO GE LE IF ELSE WHILE AND OR
+%token <string> NUM ID PALAVRAS
 
 %start programa
 
@@ -47,102 +45,95 @@ void print_string(char *string) {
 
 %%
 
-programa
-    : instrucao
-    | programa instrucao
-    ;
+linhas : linha
+       | linhas linha ;
 
-lista_impressoes : item_impressao
-      | lista_impressoes item_impressao
+
+prints : print
+      | prints print
       | EOL  { };
 
-item_impressao : expr_condicional { printf("s - [print | S].\n"); fflush(stdout); }
-      | STRING { 
-        print_string($1);        
+linha : expr EOL               {}
+      | ID '=' expr            { 
+                                    printf("var - [%s | S].\n", $1); 
+                                    fflush(stdout);
+                               }
+      
+      | IF '(' cond_marcada ')' bloco  {
+                                printf("cond - [if | S].\n");
+                                fflush(stdout);
+                               }
+      
+      
+      | IF '(' cond_marcada ')' bloco ELSE {
+                                printf("cond - [else | S].\n");
+                                fflush(stdout);
+                               } bloco { 
+                               }
+      | WHILE { 
+                printf("while - [inicio | S].\n"); 
+                fflush(stdout); 
+              } 
+      '(' cond_marcada ')' bloco 
+              {
+                printf("while - [fim | S].\n");
+                fflush(stdout);
+              }
+      |IO '=' prints {}
+      | EOL  { }
+      ;
+
+print : expr_bool { printf("s - [print | S].\n"); fflush(stdout); }
+      | PALAVRAS { 
+
+        for(int i = 1; i < strlen($1) - 1; i++){
+          if($1[i] == ' '){
+            printf("print_char(espaco).\n");
+          }else{
+
+          printf("print_char(%c).\n", $1[i]);
+          }
+
+        }
         fflush(stdout); 
         }
       ;
 
-instrucao
-    : expr eol_opcional            { }
-    | ID '=' expr                  { printf("var - [%s | S].\n", $1); fflush(stdout); }
-    | IF '(' condicao ')' eol_opcional bloco {
-                                        printf("cond - [if | S].\n");
-                                        fflush(stdout);
-                                    }
-    | IF '(' condicao ')' eol_opcional bloco ELSE eol_opcional {
-                                        printf("cond - [else | S].\n");
-                                        fflush(stdout);
-                                    } bloco
-                                    { }
-    | WHILE
-                                    {
-                                        printf("while - [inicio | S].\n");
-                                        fflush(stdout);
-                                    }
-      '(' condicao ')' eol_opcional bloco
-                                    {
-                                        printf("while - [fim | S].\n");
-                                        fflush(stdout);
-                                    }
-    | PRINT '=' lista_impressoes eol_opcional    { }
-    | EOL                           { }
-    ;
 
-condicao
-    : expr_condicional                    {
-                                        printf("condicao - [fim | S].\n");
-                                        fflush(stdout);
-                                    }
-    ;
+cond_marcada : expr_bool            { 
+                                printf("condicao - [fim | S].\n"); 
+                                fflush(stdout); 
+                               }
+             ;
+        
+expr_bool : expr              { }
+          | expr '<' expr     {printf("bool - [< | S].\n"); }  
+          | expr '>' expr     { printf("bool - [> | S].\n"); }
+          | expr EQ expr      {printf("bool - [== | S].\n");  }
+          | expr NEQ expr     {printf("bool - [/= | S].\n");  }
+          | expr GE expr      { printf("bool - [>= | S].\n"); }
+          | expr LE expr      { printf("bool - [<= | S].\n"); }
+          | expr_bool AND expr_bool { printf("bool - [&& | S].\n"); }
+          | expr_bool OR expr_bool  { printf("bool - [or | S].\n"); }
+          | '(' expr_bool ')'       { }
+          ;
 
-expr_condicional
-    : expr                                  { }
-    | expr '<' expr                         { printf("bool - [< | S].\n"); }
-    | expr '>' expr                         { printf("bool - [> | S].\n"); }
-    | expr EQ expr                          { printf("bool - [== | S].\n"); }
-    | expr NEQ expr                         { printf("bool - [/= | S].\n"); }
-    | expr GE expr                          { printf("bool - [>= | S].\n"); }
-    | expr LE expr                          { printf("bool - [<= | S].\n"); }
-    | expr_condicional AND expr_condicional { printf("bool - [&& | S].\n"); }
-    | expr_condicional OR expr_condicional  { printf("bool - [or | S].\n"); }
-    | '(' expr_condicional ')'              { }
-    ;
+bloco : '{' { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco - [fecha | S].\n"); fflush(stdout); } '}'
+      | '{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
+      | '{'  { printf("bloco - [abre | S].\n"); fflush(stdout); } linhas '}' { printf("bloco - [fecha | S].\n"); fflush(stdout); }
+      |'{' EOL { printf("bloco - [abre | S].\n"); fflush(stdout); } { printf("bloco - [fecha | S].\n"); fflush(stdout); } '}'
+      ;
 
-eol_opcional
-    : /* vazio */
-    | EOL
-    ;
-
-bloco
-    : '{' eol_opcional              {
-                                         printf("bloco - [abre | S].\n");
-                                         fflush(stdout);
-                                     }
-      instrucoes_opcional '}'       {
-                                         printf("bloco - [fecha | S].\n");
-                                         fflush(stdout);
-                                     }
-    ;
-
-instrucoes_opcional
-    : /* vazio */
-    | programa
-    ;
-
-expr
-    : NUM                   { valida_inteiro($1); printf("s - [%s | S].\n", $1); }
-    | ID                    { printf("val - [%s | S].\n", $1); }
-    | PRINT                 { printf("val - [io | S].\n"); }
-    | expr '+' expr         { printf("op - [+ | S].\n"); }
-    | expr '-' expr         { printf("op - [- | S].\n"); }
-    | expr '*' expr         { printf("op - [* | S].\n"); }
-    | expr '/' expr         { printf("op - [/ | S].\n"); }
-    | expr '%' expr         { printf("op - ['%%' | S].\n"); }
-    | '(' expr ')'          { }
-    | '-' expr %prec menos            {   
-                                printf("op - [inverso | S].\n"); }
-    ;
+expr : NUM                     { converter_int($1); printf("s - [%s | S].\n", $1); }
+    | IO                        {printf("val - [io | S].\n");}
+     | ID                      { printf("val - [%s | S].\n", $1); }
+     | expr '+' expr           { printf("op - [+ | S].\n"); }
+     | expr '-' expr           { printf("op - [- | S].\n"); }
+     | expr '*' expr           { printf("op - [* | S].\n"); }
+     | expr '/' expr           { printf("op - [/ | S].\n"); }
+     | expr '%' expr           { printf("op - ['%%' | S].\n"); }
+     | '(' expr ')'            { }
+     ;
 
 %%
 
