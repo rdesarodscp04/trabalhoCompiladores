@@ -8,7 +8,7 @@ all: $(TARGET)
 clean:
 	rm -rf $(BUILD_DIR)/*
 	rm -f *~ \#*
-	rm program program.c program.sim
+	rm program program.c
 
 # Regra para o Bison (gera os ficheiros dentro de build/)
 $(TARGET).tab.c $(TARGET).tab.h: $(PROG).y | $(BUILD_DIR)

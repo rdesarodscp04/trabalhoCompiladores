@@ -268,6 +268,11 @@ load_apt('while' - [inicio | _], Acumulador, OUT) :- !,
     read(Proximo),
     load_apt(Proximo, Acumulador, OUT).
 
+load_apt('op' - [inverso | _], Acumulador, OUT) :- !,
+    write('PUSH -1'), nl,
+    write('MUL'), nl,
+    read(Proximo),
+    load_apt(Proximo, Acumulador, OUT).
 
 
 
