@@ -42,7 +42,7 @@ void print_string(char *string) {
 %left '*' '/' '%'
 %left menos
 
-nonasac '<' '>' LE LG EQ NEQ
+%nonassoc '<' '>' LE GE EQ NEQ
 
 %left OR
 %left AND
